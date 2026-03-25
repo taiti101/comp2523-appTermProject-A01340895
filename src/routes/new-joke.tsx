@@ -7,6 +7,8 @@ import {
 import { createJoke } from "#/serverFunctions/jokeFns";
 import { useServerFn } from "@tanstack/react-start";
 import type { Joke } from "#/types";
+import { useEffect } from "react";
+import { getStoredAuthUser } from "#/auth/fakeAuth";
 
 export const Route = createFileRoute("/new-joke")({
   component: NewJokePage,
@@ -15,6 +17,14 @@ export const Route = createFileRoute("/new-joke")({
 function NewJokePage() {
   const navigate = useNavigate();
   const createJokeServerFn = useServerFn(createJoke);
+
+  useEffect(() => {
+    const user = getStoredAuthUser();
+    if (!user) {
+      navigate({ to: "/signin" });
+    }
+  }, [navigate]);
+
   const { mutateAsync, isPending, error, reset } = useMutation<
     Joke,
     Error,
@@ -44,7 +54,7 @@ function NewJokePage() {
 
       await navigate({ to: "/" });
     } catch {
-      // Error is surfaced via mutation state and rendered below the form.
+      // rendered below
     }
   };
 
@@ -98,6 +108,7 @@ function NewJokePage() {
               placeholder="Because..."
             />
           </div>
+
           <button
             type="submit"
             disabled={isPending}
@@ -105,6 +116,7 @@ function NewJokePage() {
           >
             Save Joke
           </button>
+
           {error ? (
             <p role="alert" className="mt-2 text-sm text-red-600">
               {error.message}

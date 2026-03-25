@@ -1,4 +1,4 @@
-import type { CommentRow, JokeRow } from "#/server/db/schema";
+import type { CommentRow, JokeRow, UserRow } from "#/dal/db/schema";
 
 export type Joke = Pick<JokeRow, "id" | "question" | "answer" | "score"> & {
   comments: CommentRow["body"][];
@@ -16,4 +16,21 @@ export interface VoteJokeInput {
 
 export interface DeleteJokeInput {
   id: Joke["id"];
+}
+
+export type AuthUser = Pick<UserRow, "id" | "fullName" | "email">;
+
+export interface SignupInput {
+  fullName: string;
+  email: string;
+  password: string;
+}
+
+export interface SigninInput {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  user: AuthUser;
 }

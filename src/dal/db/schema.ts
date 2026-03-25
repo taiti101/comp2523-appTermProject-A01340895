@@ -1,12 +1,24 @@
 import { relations } from "drizzle-orm";
 import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
+export const usersTable = pgTable("users", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const jokesTable = pgTable("jokes", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   score: integer("score").notNull().default(0),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const commentsTable = pgTable("comments", {
@@ -15,7 +27,9 @@ export const commentsTable = pgTable("comments", {
     .notNull()
     .references(() => jokesTable.id, { onDelete: "cascade" }),
   body: text("body").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const jokesRelations = relations(jokesTable, ({ many }) => ({
@@ -29,7 +43,11 @@ export const commentsRelations = relations(commentsTable, ({ one }) => ({
   }),
 }));
 
+export type UserRow = typeof usersTable.$inferSelect;
+export type NewUserRow = typeof usersTable.$inferInsert;
+
 export type JokeRow = typeof jokesTable.$inferSelect;
 export type NewJokeRow = typeof jokesTable.$inferInsert;
+
 export type CommentRow = typeof commentsTable.$inferSelect;
 export type NewCommentRow = typeof commentsTable.$inferInsert;
